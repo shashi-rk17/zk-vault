@@ -3,6 +3,8 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import { pool } from './db.js';
+import authRoutes from './routes/auth.js';
+import vaultRoutes from './routes/vault.js';
 
 const app = express();
 app.use(helmet());
@@ -17,6 +19,14 @@ app.get('/health', async (_req, res) => {
     console.error('DB error:', e.message);
     res.status(500).json({ ok: false, db: false });
   }
+});
+
+app.use('/auth', authRoutes);
+app.use('/vault', vaultRoutes);
+
+app.use((err, _req, res, _next) => {
+  console.error('Unhandled error:', err.message);
+  res.status(500).json({ error: 'Server error' });
 });
 
 const port = process.env.PORT || 4000;
