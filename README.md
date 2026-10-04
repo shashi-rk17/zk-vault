@@ -10,24 +10,6 @@ A zero-knowledge password manager. Everything is encrypted in the browser, so th
 
 ## How it works
 
-```
-Browser                                   Server / Database
--------                                   -----------------
-master password
-   |  Argon2id (64 MiB, t=3, random salt)
-   v
- master key
-   |  HKDF
-   +--> authKey ------------------------> hashed again (Argon2id), used to log in
-   +--> encKey  (never leaves browser)
-          |  AES-256-GCM wrap
-          v
-   random vault key ---- wrapped -------> stored wrapped
-          |  AES-256-GCM, fresh IV per entry
-          v
-   entry (site, user, password) ---------> stored as ciphertext only
-```
-
 - The master password and encryption key never leave the browser.
 - Login proves knowledge of the master password through a separate derived auth key, which the server hashes again before storing.
 - All entries, including site names, are encrypted with a random vault key. That key is wrapped by the master-derived key, so changing the master password only needs the vault key re-wrapped, not every entry re-encrypted.
